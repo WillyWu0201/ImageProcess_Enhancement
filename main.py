@@ -42,12 +42,12 @@ def lap_enhance(source, lapacian):
     newImage = np.zeros((height, width, 3), np.uint8)
     for x in range(width):
         for y in range(height):
-            value = source[y][x] + lapacian[y][x]
+            value = source[y][x] - lapacian[y][x]
             if value > 255:
                 value = 255
             else:
                 value = int(value)
-            newImage[y][x] = value#source[y][x] + lapacian[y][x] #int(value)
+            newImage[y][x] = value
     savePhoto('lap_enhance_image', newImage)
     return newImage
 
@@ -80,9 +80,29 @@ def enhancementImage(source, laplacianMask, normalization):
         for y in range(height):
             # value = normalization[y][x] * laplacianMask[y][x] + source[y][x]
             value = normalization[y][x] + source[y][x]
-            # print(value)
             newImage[y][x] = value
     savePhoto('FinalEnhancementImage', newImage)
+
+
+def enhancementImage_New(source, laplacianMask, normalization):
+    height = source.shape[0]
+    width = source.shape[1]
+    # height, width, _ = source.shape
+    newImage = np.zeros((height, width, 3), np.uint8)
+    for x in range(width):
+        for y in range(height):
+            # value = normalization[y][x] * laplacianMask[y][x] + source[y][x]
+
+            tmp7 = int(normalization[y][x][0])
+            tmp4 = int(source[y][x])
+            tmp0 = tmp4 + tmp7
+            print(y, x)
+            if tmp0 > 255:
+                newImage[y][x] = [255, 255, 255]
+            else:
+                newImage[y][x] = normalization[y][x] + source[y][x]
+
+            savePhoto('FinalEnhancementImage', newImage)
 
 # 0
 # sourceImage = readPhoto('source.jpeg')
@@ -98,4 +118,4 @@ blurImage = convolution()
 # 5
 normalizationImage = normalization(blurImage, laplacianEnhancementImage)
 # Final
-enhancementImage(sourceImage, laplacianMaskImage, normalizationImage)
+enhancementImage_New(sourceImage, laplacianMaskImage, normalizationImage)
