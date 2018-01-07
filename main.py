@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 
+
 # 讀入照片
 def readPhoto(name):
     return cv2.imread(name)
@@ -52,11 +53,24 @@ def lap_enhance(source, lapacian):
     return newImage
 
 
-def convolution():
-    image = cv2.imread('sobel_filter_image.png')
-    blurred = cv2.blur(image, (3, 3))
-    savePhoto('convolution_image', blurred)
-    return blurred
+def convolution(mask = 3):
+    source = cv2.imread('sobel_filter_image.png')
+    height = source.shape[0]
+    width = source.shape[1]
+    print(height, width)
+    newImage = np.zeros((height, width, 3), np.uint8)
+    for x in range(width):
+        for y in range(height):
+            for maskX in range(mask):
+                for maskY in range(mask):
+                    if 0 <= x + maskX < width:
+                        if 0 <= y + maskY < height:
+                            value = source[y + maskY][x + maskX][0] / 9
+                            if value > 255:
+                                value = 255
+                            newImage[y + maskY][x + maskX] = [value, value, value]
+    savePhoto('convolution_image', newImage)
+    return newImage
 
 
 def normalization(source, blur):
@@ -91,8 +105,6 @@ def enhancementImage_New(source, laplacianMask, normalization):
     newImage = np.zeros((height, width, 3), np.uint8)
     for x in range(width):
         for y in range(height):
-            # value = normalization[y][x] * laplacianMask[y][x] + source[y][x]
-
             tmp7 = int(normalization[y][x][0])
             tmp4 = int(source[y][x])
             tmp0 = tmp4 + tmp7
@@ -104,9 +116,9 @@ def enhancementImage_New(source, laplacianMask, normalization):
 
             savePhoto('FinalEnhancementImage', newImage)
 
+
 # 0
-# sourceImage = readPhoto('source.jpeg')
-sourceImage = readGrayImage('lena_color.png')
+sourceImage = readGrayImage('source.png')
 # 1
 laplacianMaskImage = laplacianMask(sourceImage)
 # 2
